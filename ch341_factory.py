@@ -144,8 +144,8 @@ if __name__ == "__main__":
                         help="Major version number (default: 1)")
     parser.add_argument("--minor-version", type=int, default=2, dest="minorVersion",
                         help="Minor version number (default: 2)")
-    parser.add_argument("--bin", default="/home/vidplace7/Documents/GitHub/ch341eeprom/ch341eeprom", 
-                        help="Path to ch341eeprom binary (default: /home/vidplace7/Documents/GitHub/ch341eeprom/ch341eeprom)")
+    parser.add_argument("--bin", default="ch341eeprom", 
+                        help="Path to ch341eeprom binary (default: ch341eeprom from PATH)")
     args = parser.parse_args()
 
     cur_serial = int(args.serial)
