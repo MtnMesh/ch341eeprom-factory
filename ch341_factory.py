@@ -37,6 +37,7 @@ class eepCH341(object):
         self.CFG = CFG
         self.VID = VID
         self.PID = PID
+        self.device_id = os.urandom(16)
 
     def __str__(self):
         return f"EEPROM: {self.majorVersion}.{self.minorVersion} {self.serial} {self.product}"
@@ -65,6 +66,8 @@ class eepCH341(object):
         # Product String bytes (32-127)
         product_bytes = bytearray(self.product.encode('ascii'))
         rom[32:32 + len(product_bytes)] = product_bytes
+        rom[32 + len(product_bytes) + 1:32 + len(product_bytes) + 16 + 1] = self.device_id
+
         return rom
 
     def hex(self):
