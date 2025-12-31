@@ -1,5 +1,5 @@
 # ch341eeprom-factory
-Flash system EEPROM for CH341A / CH341F in small batches.
+Flash/Program system EEPROM for CH341A / CH341F in small batches.
 
 Intended for use with [MeshToad](https://oshwlab.com/mtnmesh/meshtoad-v1-2), [MeshStick](https://github.com/markbirss/MESHSTICK), [MikroToad](https://oshwlab.com/nomdetom/meshtoad-v1-2_copy) and their cousins.
 

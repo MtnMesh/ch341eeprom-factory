@@ -71,6 +71,7 @@ class eepCH341(object):
         return self.bytes().hex()
 
     def erase(self, bin_ch341eeprom: str):
+        print("Erasing EEPROM...")
         r = subprocess.run([
             bin_ch341eeprom,
             # "--verbose",
@@ -91,6 +92,16 @@ class eepCH341(object):
             "--size", self.size
         ], capture_output=True, check=True)
 
+        stdout = r.stdout.decode().strip()
+        stderr = r.stderr.decode().strip()
+        if stdout != "":
+            print(stdout)
+        if stderr != "":
+            print(stderr)
+        if "Couldn't open device" in stderr:
+            print("Ensure the device is in Programming Mode and try again.")
+            exit(1)
+
         # Read the EEPROM file and return it as a byte array
         with open("read_eeprom.bin", "rb") as f:
             data = f.read()
@@ -98,14 +109,15 @@ class eepCH341(object):
 
         return data
 
-    def flash(self, bin_ch341eeprom: str):
+    def program(self, bin_ch341eeprom: str):
         # Delete existing write_eeprom.bin file if it exists
         if os.path.exists("write_eeprom.bin"):
             os.remove("write_eeprom.bin")
         # Write the byte array to a temp file
         with open("write_eeprom.bin", "wb") as f:
             f.write(self.bytes())
-        # Use `ch341eeprom` to flash the EEPROM
+        # Use `ch341eeprom` to program the EEPROM
+        print("Programming EEPROM...")
         r = subprocess.run([
             bin_ch341eeprom,
             # "--verbose",
@@ -124,6 +136,7 @@ class eepCH341(object):
         with open("verify_eeprom.bin", "wb") as f:
             f.write(self.bytes())
         # Use `ch341eeprom` to verify the EEPROM
+        print("Verifying EEPROM...")
         r = subprocess.run([
             bin_ch341eeprom,
             # "--verbose",
@@ -155,7 +168,7 @@ if __name__ == "__main__":
         eeprom = eepCH341(args.majorVersion, args.minorVersion, str(cur_serial), args.product)
         # print(eeprom.hex())
 
-        # Read the EEPROM before flashing
+        # Read the EEPROM before programming
         read_init = eeprom.read(args.bin)
         if len(read_init) != eeprom.size_bytes:
             raise ValueError(f"EEPROM read error: expected {eeprom.size_bytes} bytes, got {len(read_init)} bytes")
@@ -163,10 +176,10 @@ if __name__ == "__main__":
         # Erase the EEPROM
         eeprom.erase(args.bin)
 
-        # Flash/verify the EEPROM
-        eeprom.flash(args.bin)
+        # Program/verify the EEPROM
+        eeprom.program(args.bin)
         eeprom.verify(args.bin)
-        print(f"Flashed EEPROM for {args.product} {cur_serial}")
+        print(f"Programmed EEPROM for {args.product} {cur_serial}")
 
         # Read the EEPROM again
         read_again = eeprom.read(args.bin)
